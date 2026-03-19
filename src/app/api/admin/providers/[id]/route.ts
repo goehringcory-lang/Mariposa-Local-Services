@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendApprovalEmail } from "@/lib/email";
 
 export async function GET(
   _request: NextRequest,
@@ -44,9 +45,21 @@ export async function PATCH(
         data: { status: "APPROVED" },
         include: { category: true },
       });
-      // In production, this would send a Stripe payment link email
-      // For now, we also set paymentStatus to PAID for testing
-      // TODO: Remove auto-PAID when Stripe is configured
+
+      // Send approval email to the provider
+      try {
+        await sendApprovalEmail({
+          providerName: provider.name,
+          providerEmail: provider.email,
+          categoryName: provider.category.name,
+        });
+      } catch (emailError) {
+        console.error("Approval email failed:", emailError);
+        // Don't block the approval if email fails
+      }
+
+      // Auto-set paymentStatus to PAID for testing
+      // TODO: Remove when Stripe is configured
       await prisma.provider.update({
         where: { id },
         data: { paymentStatus: "PAID" },

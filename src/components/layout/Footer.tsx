@@ -33,6 +33,14 @@ export default function Footer() {
               </li>
               <li>
                 <Link
+                  href="/advertise"
+                  className="text-gray-300 hover:text-white text-base min-h-[48px] inline-flex items-center"
+                >
+                  Advertise With Us
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/about"
                   className="text-gray-300 hover:text-white text-base min-h-[48px] inline-flex items-center"
                 >

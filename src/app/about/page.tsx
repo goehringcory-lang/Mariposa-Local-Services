@@ -14,9 +14,9 @@ export default function AboutPage() {
           </h2>
           <p className="text-lg text-gray-500">
             Here in Mariposa and the surrounding foothill communities, people are
-            always looking for reliable local workers — electricians, handymen,
-            cleaners, landscapers, mechanics, and more. But there&apos;s no easy,
-            central place to find them.
+            always looking for reliable local help — handyman trades, land
+            management, cleaning services, firewood, pet care, senior support,
+            and more. But there&apos;s no easy, central place to find them.
           </p>
           <p className="text-lg text-gray-500 mt-3">
             Big websites like Angie&apos;s List don&apos;t serve our rural community

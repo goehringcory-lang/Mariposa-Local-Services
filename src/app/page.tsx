@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import CategoryIcon from "@/components/categories/CategoryIcon";
-import AdBanner from "@/components/ads/AdBanner";
+import AdSlot from "@/components/ads/AdSlot";
 
 export default async function Home() {
   const categories = await prisma.category.findMany({
@@ -58,7 +58,7 @@ export default async function Home() {
         <h2 className="text-3xl font-bold text-gray-700 mb-8 text-center">
           Browse Services
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {categories.map((category) => (
             <Link
               key={category.id}
@@ -81,8 +81,8 @@ export default async function Home() {
       </section>
 
       {/* Sponsored Ads */}
-      <AdBanner placement="banner" limit={2} />
-      <AdBanner placement="sidebar" limit={3} />
+      <AdSlot placement="banner" />
+      <AdSlot placement="sidebar" />
 
       {/* CTA Section */}
       <section className="bg-white py-10 px-4">

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import PhoneButton from "@/components/ui/PhoneButton";
 import StarRating from "@/components/ui/StarRating";
-import AdBanner from "@/components/ads/AdBanner";
+import AdSlot from "@/components/ads/AdSlot";
 
 export default async function CategoryPage({
   params,
@@ -125,7 +125,7 @@ export default async function CategoryPage({
 
       {/* Sponsored Ads */}
       <div className="mt-8">
-        <AdBanner placement="category" limit={2} />
+        <AdSlot placement="category" />
       </div>
     </div>
   );

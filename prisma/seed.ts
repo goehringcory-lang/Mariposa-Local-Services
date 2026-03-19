@@ -7,62 +7,54 @@ async function main() {
   // Create categories
   const categories = [
     {
-      name: "Electricians",
-      slug: "electricians",
-      description: "Licensed and experienced electricians for residential and commercial work",
-      icon: "bolt",
+      name: "Property Maintenance & Handyman Trades",
+      slug: "property-maintenance-handyman-trades",
+      description: "General handyman, plumbing, concrete & masonry, small engine & equipment repair",
+      icon: "wrench",
       sortOrder: 1,
     },
     {
-      name: "Handymen",
-      slug: "handymen",
-      description: "General home repairs, maintenance, and odd jobs",
-      icon: "wrench",
+      name: "Land & Vegetation Management",
+      slug: "land-vegetation-management",
+      description: "Weed abatement, heavy excavation, brush clearing & fire breaks, tree services",
+      icon: "tree",
       sortOrder: 2,
     },
     {
-      name: "Vacation Rental Cleaners",
-      slug: "vacation-rental-cleaners",
-      description: "Professional cleaning services for vacation rentals and homes",
+      name: "Short-Term Rental & Residential Cleaning",
+      slug: "short-term-rental-residential-cleaning",
+      description: "STR turnover cleaning, luxury & deep cleaning, routine residential, local property management",
       icon: "sparkles",
       sortOrder: 3,
     },
     {
-      name: "Landscaping & Weed Eating",
-      slug: "landscaping-weed-eating",
-      description: "Yard work, weed eating, brush clearing, and landscaping",
-      icon: "leaf",
+      name: "Firewood Services",
+      slug: "firewood-services",
+      description: "Seasoned firewood sales, delivery & logistics, wood splitting & stacking",
+      icon: "log",
       sortOrder: 4,
     },
     {
-      name: "Plumbers",
-      slug: "plumbers",
-      description: "Plumbing repairs, installations, and emergency services",
-      icon: "droplet",
+      name: "Pet Care & Animal Sitting",
+      slug: "pet-care-animal-sitting",
+      description: "Pet sitting & doggy daycare, overnight boarding, dog walking, specialized pet care",
+      icon: "pets",
       sortOrder: 5,
     },
     {
-      name: "Mobile Mechanics",
-      slug: "mobile-mechanics",
-      description: "Auto repair and maintenance that comes to you",
-      icon: "truck",
+      name: "Domestic & Senior Support",
+      slug: "domestic-senior-support",
+      description: "In-home chore assistance, homemaker services",
+      icon: "heart-hand",
       sortOrder: 6,
     },
-    {
-      name: "Painters",
-      slug: "painters",
-      description: "Interior and exterior painting services",
-      icon: "paintbrush",
-      sortOrder: 7,
-    },
-    {
-      name: "Other Services",
-      slug: "other-services",
-      description: "Other local services and trades",
-      icon: "grid",
-      sortOrder: 99,
-    },
   ];
+
+  // Remove old categories that are no longer in the new set
+  const newSlugs = categories.map((c) => c.slug);
+  await prisma.category.deleteMany({
+    where: { slug: { notIn: newSlugs } },
+  });
 
   for (const cat of categories) {
     await prisma.category.upsert({

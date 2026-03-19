@@ -13,7 +13,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Mariposa Local Services — Find Trusted Local Workers",
   description:
-    "Your local directory for finding trusted electricians, handymen, cleaners, landscapers, and more in Mariposa, California and surrounding foothill communities.",
+    "Your local directory for finding trusted property maintenance, land management, cleaning, firewood, pet care, and senior support services in Mariposa, California and surrounding foothill communities.",
 };
 
 export default function RootLayout({

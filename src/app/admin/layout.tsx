@@ -33,12 +33,6 @@ export default function AdminLayout({
               >
                 Reviews
               </Link>
-              <Link
-                href="/admin/ads"
-                className="hover:text-accent transition-colors min-h-[48px] flex items-center text-base"
-              >
-                Ads
-              </Link>
             </div>
           </div>
           <div className="flex items-center gap-4">

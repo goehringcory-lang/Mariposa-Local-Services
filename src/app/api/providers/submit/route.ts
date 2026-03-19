@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendNewSubmissionNotification } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,6 +37,18 @@ export async function POST(request: NextRequest) {
         paymentStatus: "UNPAID",
       },
     });
+
+    // Notify admin of new submission
+    try {
+      await sendNewSubmissionNotification({
+        providerName: provider.name,
+        providerEmail: provider.email,
+        providerPhone: provider.phone,
+        categoryName: category.name,
+      });
+    } catch {
+      // Don't block submission if notification fails
+    }
 
     return NextResponse.json(
       { message: "Submission received", id: provider.id },

@@ -1,35 +1,48 @@
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import {
+  HOMEPAGE_BANNER_ADS,
+  HOMEPAGE_SIDEBAR_ADS,
+  CATEGORY_ADS,
+  type Ad,
+} from "@/config/ads";
 
-interface AdBannerProps {
+interface AdSlotProps {
   placement: "sidebar" | "banner" | "category";
-  limit?: number;
 }
 
-export default async function AdBanner({
-  placement,
-  limit = 3,
-}: AdBannerProps) {
-  const now = new Date();
-  const ads = await prisma.ad.findMany({
-    where: {
-      active: true,
-      placement,
-      startDate: { lte: now },
-      OR: [{ endDate: null }, { endDate: { gte: now } }],
-    },
-    orderBy: { sortOrder: "asc" },
-    take: limit,
-  });
+export default function AdSlot({ placement }: AdSlotProps) {
+  const adsMap = {
+    banner: HOMEPAGE_BANNER_ADS,
+    sidebar: HOMEPAGE_SIDEBAR_ADS,
+    category: CATEGORY_ADS,
+  };
 
-  if (ads.length === 0) return null;
+  const ads = adsMap[placement];
+
+  // If no ads configured, show placeholder linking to /advertise
+  if (ads.length === 0) {
+    return (
+      <div className="mx-auto max-w-6xl px-4 py-6">
+        <Link href="/advertise" className="block">
+          <div className="bg-amber-50 border-2 border-amber-200 border-dashed rounded-xl p-6 text-center hover:shadow-md transition-shadow">
+            <p className="text-lg font-bold text-gray-600">
+              Your Business Here
+            </p>
+            <p className="text-base text-gray-500 mt-1">
+              Advertise with Mariposa Local Services — reach your neighbors!
+            </p>
+          </div>
+        </Link>
+      </div>
+    );
+  }
 
   if (placement === "banner") {
     return (
       <div className="mx-auto max-w-6xl px-4 py-6">
         <div className="space-y-4">
-          {ads.map((ad) => (
-            <AdCard key={ad.id} ad={ad} variant="banner" />
+          {ads.map((ad, i) => (
+            <AdCard key={i} ad={ad} variant="banner" />
           ))}
         </div>
       </div>
@@ -43,31 +56,22 @@ export default async function AdBanner({
           Local Sponsors
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {ads.map((ad) => (
-            <AdCard key={ad.id} ad={ad} variant="sidebar" />
+          {ads.map((ad, i) => (
+            <AdCard key={i} ad={ad} variant="sidebar" />
           ))}
         </div>
       </div>
     );
   }
 
-  // category placement - inline between listings
+  // category placement
   return (
     <div className="space-y-4">
-      {ads.map((ad) => (
-        <AdCard key={ad.id} ad={ad} variant="category" />
+      {ads.map((ad, i) => (
+        <AdCard key={i} ad={ad} variant="category" />
       ))}
     </div>
   );
-}
-
-interface Ad {
-  id: string;
-  title: string;
-  businessName: string;
-  imageUrl: string | null;
-  linkUrl: string | null;
-  description: string | null;
 }
 
 function AdCard({ ad, variant }: { ad: Ad; variant: string }) {
@@ -108,14 +112,14 @@ function AdCard({ ad, variant }: { ad: Ad; variant: string }) {
 
   if (ad.linkUrl) {
     return (
-      <Link
-        href={`/api/ads/${ad.id}/click`}
+      <a
+        href={ad.linkUrl}
         target="_blank"
         rel="noopener noreferrer"
         className="block"
       >
         {content}
-      </Link>
+      </a>
     );
   }
 
