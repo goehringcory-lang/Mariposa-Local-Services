@@ -22,7 +22,6 @@ export default async function CategoryPage({
     where: {
       categoryId: category.id,
       status: "APPROVED",
-      paymentStatus: "PAID",
     },
     include: {
       reviews: {

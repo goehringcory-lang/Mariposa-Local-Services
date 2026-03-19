@@ -13,7 +13,7 @@ interface Provider {
   categoryId: string;
   areaServed: string;
   status: string;
-  paymentStatus: string;
+
   createdAt: string;
   category: { name: string };
 }
@@ -85,15 +85,6 @@ export default function AdminProviderDetailPage() {
           >
             {provider.status}
           </span>
-          <span
-            className={`px-3 py-1 rounded text-sm font-bold ${
-              provider.paymentStatus === "PAID"
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
-            }`}
-          >
-            {provider.paymentStatus}
-          </span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -142,7 +133,7 @@ export default function AdminProviderDetailPage() {
               >
                 {actionLoading === "approve"
                   ? "Approving..."
-                  : "Approve & Send Payment Link"}
+                  : "Approve"}
               </button>
               <button
                 onClick={() => handleAction("reject")}

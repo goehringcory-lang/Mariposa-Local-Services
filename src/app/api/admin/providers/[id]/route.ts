@@ -55,15 +55,8 @@ export async function PATCH(
         });
       } catch (emailError) {
         console.error("Approval email failed:", emailError);
-        // Don't block the approval if email fails
       }
 
-      // Auto-set paymentStatus to PAID for testing
-      // TODO: Remove when Stripe is configured
-      await prisma.provider.update({
-        where: { id },
-        data: { paymentStatus: "PAID" },
-      });
       const updated = await prisma.provider.findUnique({
         where: { id },
         include: { category: true },

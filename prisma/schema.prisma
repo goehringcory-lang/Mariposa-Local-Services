@@ -17,9 +17,6 @@ model Provider {
   category             Category @relation(fields: [categoryId], references: [id])
   areaServed           String   @default("Mariposa & Surrounding Areas")
   status               String   @default("PENDING")
-  stripeCustomerId     String?
-  stripeSubscriptionId String?
-  paymentStatus        String   @default("UNPAID")
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
   reviews              Review[]

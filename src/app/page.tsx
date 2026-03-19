@@ -10,7 +10,7 @@ export default async function Home() {
       _count: {
         select: {
           providers: {
-            where: { status: "APPROVED", paymentStatus: "PAID" },
+            where: { status: "APPROVED" },
           },
         },
       },

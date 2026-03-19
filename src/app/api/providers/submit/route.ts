@@ -34,7 +34,6 @@ export async function POST(request: NextRequest) {
         categoryId,
         areaServed: areaServed?.trim() || "Mariposa & Surrounding Areas",
         status: "PENDING",
-        paymentStatus: "UNPAID",
       },
     });
 

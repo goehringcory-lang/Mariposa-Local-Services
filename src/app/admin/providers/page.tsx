@@ -30,12 +30,6 @@ export default async function AdminProvidersPage({
     SUSPENDED: "bg-gray-100 text-gray-800",
   };
 
-  const paymentColors: Record<string, string> = {
-    UNPAID: "bg-red-100 text-red-800",
-    PAID: "bg-green-100 text-green-800",
-    PAST_DUE: "bg-yellow-100 text-yellow-800",
-    CANCELLED: "bg-gray-100 text-gray-800",
-  };
 
   return (
     <div>
@@ -81,11 +75,6 @@ export default async function AdminProvidersPage({
                     className={`px-2 py-1 rounded text-sm font-bold ${statusColors[provider.status]}`}
                   >
                     {provider.status}
-                  </span>
-                  <span
-                    className={`px-2 py-1 rounded text-sm font-bold ${paymentColors[provider.paymentStatus]}`}
-                  >
-                    {provider.paymentStatus}
                   </span>
                 </div>
                 <p className="text-base text-gray-400 mt-1">

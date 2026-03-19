@@ -11,7 +11,7 @@ export default async function AdminDashboard() {
     await Promise.all([
       prisma.provider.count({ where: { status: "PENDING" } }),
       prisma.provider.count({
-        where: { status: "APPROVED", paymentStatus: "PAID" },
+        where: { status: "APPROVED" },
       }),
       prisma.review.count(),
       prisma.provider.findMany({

@@ -13,7 +13,7 @@ export default async function ProviderPage({
   const { id } = await params;
 
   const provider = await prisma.provider.findUnique({
-    where: { id, status: "APPROVED", paymentStatus: "PAID" },
+    where: { id, status: "APPROVED" },
     include: {
       category: true,
       reviews: {
