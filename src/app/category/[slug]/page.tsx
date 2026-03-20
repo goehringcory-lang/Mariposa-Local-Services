@@ -5,6 +5,8 @@ import PhoneButton from "@/components/ui/PhoneButton";
 import StarRating from "@/components/ui/StarRating";
 import AdSlot from "@/components/ads/AdSlot";
 
+export const revalidate = 60;
+
 export default async function CategoryPage({
   params,
 }: {

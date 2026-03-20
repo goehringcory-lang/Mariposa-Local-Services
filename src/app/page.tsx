@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import CategoryIcon from "@/components/categories/CategoryIcon";
 import AdSlot from "@/components/ads/AdSlot";
 
+export const revalidate = 60;
+
 export default async function Home() {
   const categories = await prisma.category.findMany({
     orderBy: { sortOrder: "asc" },

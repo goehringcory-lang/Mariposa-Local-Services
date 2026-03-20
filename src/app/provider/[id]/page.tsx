@@ -5,6 +5,8 @@ import PhoneButton from "@/components/ui/PhoneButton";
 import StarRating from "@/components/ui/StarRating";
 import ReviewForm from "@/components/reviews/ReviewForm";
 
+export const revalidate = 60;
+
 export default async function ProviderPage({
   params,
 }: {
