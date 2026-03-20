@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import SessionProvider from "@/components/auth/SessionProvider";
+import { Analytics } from "@vercel/analytics/react";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,6 +29,7 @@ export default function RootLayout({
           <Header />
           <main className="min-h-[calc(100vh-200px)]">{children}</main>
           <Footer />
+          <Analytics />
         </SessionProvider>
       </body>
     </html>
