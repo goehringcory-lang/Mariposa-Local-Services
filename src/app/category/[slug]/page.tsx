@@ -34,7 +34,8 @@ export default async function CategoryPage({
     orderBy: { name: "asc" },
   });
 
-  // Sort by average rating (highest first), then alphabetically
+  // Sort by: highest avg rating → most reviews → alphabetical
+  // Providers with no reviews go to the bottom, sorted alphabetically
   const sortedProviders = providers
     .map((p) => ({
       ...p,
@@ -44,7 +45,20 @@ export default async function CategoryPage({
           : 0,
       reviewCount: p.reviews.length,
     }))
-    .sort((a, b) => b.avgRating - a.avgRating || a.name.localeCompare(b.name));
+    .sort((a, b) => {
+      // Providers with reviews always rank above those without
+      if (a.reviewCount > 0 && b.reviewCount === 0) return -1;
+      if (a.reviewCount === 0 && b.reviewCount > 0) return 1;
+      // Both have no reviews — sort alphabetically
+      if (a.reviewCount === 0 && b.reviewCount === 0)
+        return a.name.localeCompare(b.name);
+      // Both have reviews — highest rating first, then most reviews, then alphabetical
+      return (
+        b.avgRating - a.avgRating ||
+        b.reviewCount - a.reviewCount ||
+        a.name.localeCompare(b.name)
+      );
+    });
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
