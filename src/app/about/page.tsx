@@ -81,6 +81,24 @@ export default function AboutPage() {
             </Link>
           </div>
         </div>
+
+        <div>
+          <h2 className="text-2xl font-bold text-gray-600 mb-3">
+            Questions or Concerns?
+          </h2>
+          <p className="text-lg text-gray-500">
+            Have a question, suggestion, or need help with something? Feel free
+            to reach out — we&apos;d love to hear from you.
+          </p>
+          <div className="mt-4">
+            <a
+              href="mailto:goehring.cory@gmail.com?subject=Mariposa Local Services — Question"
+              className="inline-flex items-center justify-center bg-primary hover:bg-primary-dark text-white text-lg font-bold px-6 py-3 rounded-xl transition-colors min-h-[48px]"
+            >
+              Email Us
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );
