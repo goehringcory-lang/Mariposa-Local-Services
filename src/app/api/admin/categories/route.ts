@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { name, description } = body;
+  const { name, description, icon } = body;
 
   if (!name) {
     return NextResponse.json({ error: "Name is required" }, { status: 400 });
@@ -42,6 +42,7 @@ export async function POST(request: NextRequest) {
       name,
       slug,
       description: description || null,
+      icon: icon || null,
       sortOrder: (maxOrder._max.sortOrder || 0) + 1,
     },
   });

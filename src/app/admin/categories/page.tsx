@@ -17,6 +17,7 @@ export default function AdminCategoriesPage() {
   const [loading, setLoading] = useState(true);
   const [newName, setNewName] = useState("");
   const [newDescription, setNewDescription] = useState("");
+  const [newIcon, setNewIcon] = useState("");
   const [adding, setAdding] = useState(false);
 
   useEffect(() => {
@@ -41,12 +42,14 @@ export default function AdminCategoriesPage() {
       body: JSON.stringify({
         name: newName.trim(),
         description: newDescription.trim() || null,
+        icon: newIcon.trim() || null,
       }),
     });
 
     if (res.ok) {
       setNewName("");
       setNewDescription("");
+      setNewIcon("");
       loadCategories();
     }
     setAdding(false);
@@ -89,6 +92,13 @@ export default function AdminCategoriesPage() {
             placeholder="Description (optional)"
             className="flex-1 border-2 border-gray-200 rounded-lg px-4 py-3 text-lg focus:border-primary focus:outline-none"
           />
+          <input
+            type="text"
+            value={newIcon}
+            onChange={(e) => setNewIcon(e.target.value)}
+            placeholder="Icon key (e.g. wrench, fridge)"
+            className="md:w-48 border-2 border-gray-200 rounded-lg px-4 py-3 text-lg focus:border-primary focus:outline-none"
+          />
           <button
             type="submit"
             disabled={adding}
@@ -110,6 +120,7 @@ export default function AdminCategoriesPage() {
               <p className="text-lg font-bold text-gray-600">{cat.name}</p>
               <p className="text-base text-gray-400">
                 {cat.description || "No description"} &middot;{" "}
+                Icon: {cat.icon || "none"} &middot;{" "}
                 {cat._count.providers} providers &middot; Order: {cat.sortOrder}
               </p>
             </div>
