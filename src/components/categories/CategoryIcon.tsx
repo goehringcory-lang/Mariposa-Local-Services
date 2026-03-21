@@ -50,6 +50,26 @@ export default function CategoryIcon({
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 17c0-1 1-2 3-2h8c2 0 3 1 3 2v1c0 1-1 2-3 2H8c-2 0-3-1-3-2v-1z" />
       </svg>
     ),
+    fridge: (
+      <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {/* Refrigerator icon */}
+        <rect x="5" y="2" width="14" height="20" rx="2" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+        <line x1="5" y1="10" x2="19" y2="10" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+        <line x1="16" y1="5" x2="16" y2="8" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+        <line x1="16" y1="13" x2="16" y2="17" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+      </svg>
+    ),
+    computer: (
+      <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {/* Monitor */}
+        <rect x="2" y="3" width="15" height="11" rx="1" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+        <line x1="6" y1="17" x2="13" y2="17" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+        <line x1="9.5" y1="14" x2="9.5" y2="17" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+        {/* Phone */}
+        <rect x="18" y="7" width="5" height="9" rx="1" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+        <line x1="19.5" y1="14" x2="21.5" y2="14" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+      </svg>
+    ),
     grid: (
       <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />

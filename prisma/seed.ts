@@ -48,6 +48,20 @@ async function main() {
       icon: "heart-hand",
       sortOrder: 6,
     },
+    {
+      name: "Appliance Repair",
+      slug: "appliance-repair",
+      description: "Refrigerator, washer, dryer, dishwasher, oven & general appliance repair",
+      icon: "fridge",
+      sortOrder: 7,
+    },
+    {
+      name: "Computer & Device Services",
+      slug: "computer-device-services",
+      description: "Computer repair, cell phone screen replacement, tablet repair, data recovery",
+      icon: "computer",
+      sortOrder: 8,
+    },
   ];
 
   // Remove old categories that are no longer in the new set
