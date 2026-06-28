@@ -27,7 +27,7 @@ export default function AdminProviderDetailPage() {
 
   useEffect(() => {
     fetch(`/api/admin/providers/${id}`)
-      .then((r) => r.json())
+      .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         setProvider(data);
         setLoading(false);
@@ -35,7 +35,7 @@ export default function AdminProviderDetailPage() {
       .catch(() => setLoading(false));
   }, [id]);
 
-  async function handleAction(action: string) {
+  async function handleAction(action: string): Promise<boolean> {
     setActionLoading(action);
     try {
       const res = await fetch(`/api/admin/providers/${id}`, {
@@ -44,9 +44,15 @@ export default function AdminProviderDetailPage() {
         body: JSON.stringify({ action }),
       });
       if (res.ok) {
-        const updated = await res.json();
-        setProvider(updated);
+        // The delete action returns a message, not a provider record.
+        if (action !== "delete") {
+          const updated = await res.json();
+          setProvider(updated);
+        }
+        return true;
       }
+      alert("Action failed. Please try again.");
+      return false;
     } finally {
       setActionLoading("");
     }
@@ -166,7 +172,9 @@ export default function AdminProviderDetailPage() {
           <button
             onClick={() => {
               if (confirm("Are you sure you want to delete this provider?")) {
-                handleAction("delete").then(() => router.push("/admin/providers"));
+                handleAction("delete").then((success) => {
+                  if (success) router.push("/admin/providers");
+                });
               }
             }}
             disabled={!!actionLoading}

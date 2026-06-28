@@ -24,10 +24,15 @@ export default function AdminCategoriesPage() {
   }, []);
 
   async function loadCategories() {
-    const res = await fetch("/api/admin/categories");
-    const data = await res.json();
-    setCategories(data);
-    setLoading(false);
+    try {
+      const res = await fetch("/api/admin/categories");
+      const data = await res.json();
+      setCategories(Array.isArray(data) ? data : []);
+    } catch {
+      setCategories([]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleAdd(e: React.FormEvent) {
@@ -48,16 +53,30 @@ export default function AdminCategoriesPage() {
       setNewName("");
       setNewDescription("");
       loadCategories();
+    } else {
+      const data = await res.json().catch(() => ({}));
+      alert(data.error || "Failed to add category.");
     }
     setAdding(false);
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this category? Providers in it will need reassignment."))
+    if (
+      !confirm(
+        "Delete this category? It must have no providers before it can be deleted."
+      )
+    )
       return;
 
-    await fetch(`/api/admin/categories?id=${id}`, { method: "DELETE" });
-    loadCategories();
+    const res = await fetch(`/api/admin/categories?id=${id}`, {
+      method: "DELETE",
+    });
+    if (res.ok) {
+      loadCategories();
+    } else {
+      const data = await res.json().catch(() => ({}));
+      alert(data.error || "Failed to delete category.");
+    }
   }
 
   if (loading) return <p className="text-lg text-gray-400 py-8">Loading...</p>;

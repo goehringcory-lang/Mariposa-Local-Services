@@ -14,6 +14,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(String(email).trim())) {
+      return NextResponse.json(
+        { error: "Please enter a valid email address." },
+        { status: 400 }
+      );
+    }
+
     // Verify category exists
     const category = await prisma.category.findUnique({
       where: { id: categoryId },

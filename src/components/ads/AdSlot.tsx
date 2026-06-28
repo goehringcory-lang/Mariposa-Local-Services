@@ -8,9 +8,15 @@ import {
 
 interface AdSlotProps {
   placement: "sidebar" | "banner" | "category";
+  // When there are no ads, render the "Your Business Here" CTA. Set to false to
+  // render nothing so multiple empty slots on one page don't duplicate the CTA.
+  showPlaceholderWhenEmpty?: boolean;
 }
 
-export default function AdSlot({ placement }: AdSlotProps) {
+export default function AdSlot({
+  placement,
+  showPlaceholderWhenEmpty = true,
+}: AdSlotProps) {
   const adsMap = {
     banner: HOMEPAGE_BANNER_ADS,
     sidebar: HOMEPAGE_SIDEBAR_ADS,
@@ -21,6 +27,7 @@ export default function AdSlot({ placement }: AdSlotProps) {
 
   // If no ads configured, show placeholder linking to /advertise
   if (ads.length === 0) {
+    if (!showPlaceholderWhenEmpty) return null;
     return (
       <div className="mx-auto max-w-6xl px-4 py-6">
         <Link href="/advertise" className="block">

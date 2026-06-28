@@ -57,11 +57,7 @@ export async function PATCH(
         console.error("Approval email failed:", emailError);
       }
 
-      const updated = await prisma.provider.findUnique({
-        where: { id },
-        include: { category: true },
-      });
-      return NextResponse.json(updated);
+      return NextResponse.json(provider);
     }
 
     if (action === "reject") {
