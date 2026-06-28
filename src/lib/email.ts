@@ -1,6 +1,21 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Construct the Resend client lazily. The Resend constructor throws when no API
+// key is present, which would otherwise crash `next build` (page-data
+// collection) in any environment where RESEND_API_KEY isn't set. Returning null
+// lets email simply no-op when unconfigured.
+function getResend(): Resend | null {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return null;
+  return new Resend(apiKey);
+}
+
+// Resend's shared "onboarding@resend.dev" sender only delivers to the Resend
+// account owner's own address. To reach providers, set EMAIL_FROM to an address
+// on a domain you've verified in Resend (e.g. "Mariposa Local Services <hello@yourdomain.com>").
+const FROM_ADDRESS =
+  process.env.EMAIL_FROM ||
+  "Mariposa Local Services <onboarding@resend.dev>";
 
 interface SendApprovalEmailParams {
   providerName: string;
@@ -13,8 +28,14 @@ export async function sendApprovalEmail({
   providerEmail,
   categoryName,
 }: SendApprovalEmailParams) {
+  const resend = getResend();
+  if (!resend) {
+    console.warn("RESEND_API_KEY not set — skipping approval email.");
+    return null;
+  }
+
   const { data, error } = await resend.emails.send({
-    from: "Mariposa Local Services <onboarding@resend.dev>",
+    from: FROM_ADDRESS,
     to: providerEmail,
     subject: "Your listing has been approved! — Mariposa Local Services",
     html: `
@@ -65,8 +86,14 @@ export async function sendNewSubmissionNotification({
 }: SendNotificationToAdminParams) {
   const adminEmail = process.env.ADMIN_EMAIL || "goehring.cory@gmail.com";
 
+  const resend = getResend();
+  if (!resend) {
+    console.warn("RESEND_API_KEY not set — skipping admin notification email.");
+    return null;
+  }
+
   const { data, error } = await resend.emails.send({
-    from: "Mariposa Local Services <onboarding@resend.dev>",
+    from: FROM_ADDRESS,
     to: adminEmail,
     subject: `New listing submission: ${providerName}`,
     html: `

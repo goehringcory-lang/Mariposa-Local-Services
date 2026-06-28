@@ -24,6 +24,12 @@ export default function Header() {
               List Your Business
             </Link>
             <Link
+              href="/advertise"
+              className="text-lg font-medium hover:text-accent transition-colors min-h-[48px] flex items-center"
+            >
+              Advertise
+            </Link>
+            <Link
               href="/about"
               className="text-lg font-medium hover:text-accent transition-colors min-h-[48px] flex items-center"
             >
@@ -69,6 +75,12 @@ function MobileMenuButton() {
             className="block px-6 py-3 text-lg text-gray-700 hover:bg-gray-100"
           >
             List Your Business
+          </Link>
+          <Link
+            href="/advertise"
+            className="block px-6 py-3 text-lg text-gray-700 hover:bg-gray-100"
+          >
+            Advertise
           </Link>
           <Link
             href="/about"

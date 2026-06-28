@@ -68,8 +68,8 @@ export default function SubmitPage() {
             and get back to you shortly.
           </p>
           <p className="text-lg text-gray-400 mb-6">
-            Once approved, you&apos;ll receive an email with a link to complete
-            your listing payment.
+            Once approved, you&apos;ll receive a confirmation email and your
+            listing will go live in the directory.
           </p>
           <Link
             href="/"

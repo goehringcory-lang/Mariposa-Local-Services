@@ -84,7 +84,7 @@ export default async function Home() {
 
       {/* Sponsored Ads */}
       <AdSlot placement="banner" />
-      <AdSlot placement="sidebar" />
+      <AdSlot placement="sidebar" showPlaceholderWhenEmpty={false} />
 
       {/* CTA Section */}
       <section className="bg-white py-10 px-4">

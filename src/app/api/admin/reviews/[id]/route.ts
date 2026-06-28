@@ -13,6 +13,11 @@ export async function DELETE(
 
   const { id } = await params;
 
-  await prisma.review.delete({ where: { id } });
-  return NextResponse.json({ message: "Deleted" });
+  try {
+    await prisma.review.delete({ where: { id } });
+    return NextResponse.json({ message: "Deleted" });
+  } catch {
+    // Prisma throws P2025 when the record doesn't exist.
+    return NextResponse.json({ error: "Review not found" }, { status: 404 });
+  }
 }

@@ -62,6 +62,25 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: "ID is required" }, { status: 400 });
   }
 
+  const category = await prisma.category.findUnique({
+    where: { id },
+    include: { _count: { select: { providers: true } } },
+  });
+
+  if (!category) {
+    return NextResponse.json({ error: "Category not found" }, { status: 404 });
+  }
+
+  if (category._count.providers > 0) {
+    return NextResponse.json(
+      {
+        error:
+          "This category still has providers. Move or remove them before deleting it.",
+      },
+      { status: 409 }
+    );
+  }
+
   await prisma.category.delete({ where: { id } });
   return NextResponse.json({ message: "Deleted" });
 }
