@@ -5,7 +5,14 @@ import { sendNewSubmissionNotification } from "@/lib/email";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, phone, email, description, categoryId, areaServed } = body;
+    const { categoryId } = body;
+    const name = typeof body.name === "string" ? body.name.trim() : "";
+    const phone = typeof body.phone === "string" ? body.phone.trim() : "";
+    const email = typeof body.email === "string" ? body.email.trim() : "";
+    const description =
+      typeof body.description === "string" ? body.description.trim() : "";
+    const areaServed =
+      typeof body.areaServed === "string" ? body.areaServed.trim() : "";
 
     if (!name || !phone || !email || !description || !categoryId) {
       return NextResponse.json(
@@ -15,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(String(email).trim())) {
+    if (!emailPattern.test(email)) {
       return NextResponse.json(
         { error: "Please enter a valid email address." },
         { status: 400 }
@@ -35,12 +42,12 @@ export async function POST(request: NextRequest) {
 
     const provider = await prisma.provider.create({
       data: {
-        name: name.trim(),
-        phone: phone.trim(),
-        email: email.trim().toLowerCase(),
-        description: description.trim(),
+        name,
+        phone,
+        email: email.toLowerCase(),
+        description,
         categoryId,
-        areaServed: areaServed?.trim() || "Mariposa & Surrounding Areas",
+        areaServed: areaServed || "Mariposa & Surrounding Areas",
         status: "PENDING",
       },
     });

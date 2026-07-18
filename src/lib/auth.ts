@@ -4,6 +4,10 @@ import { compare } from "bcryptjs";
 import { prisma } from "./prisma";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  // Required for self-hosted deployments. Without it NextAuth throws
+  // UntrustedHost and auth() resolves to an error object instead of a session
+  // — which is truthy, so naive `if (!session)` checks would let everyone in.
+  trustHost: true,
   providers: [
     Credentials({
       name: "Admin Login",

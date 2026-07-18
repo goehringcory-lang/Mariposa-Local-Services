@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -7,14 +8,24 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
-  if (!session) {
+  if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { id } = await params;
 
   try {
-    await prisma.review.delete({ where: { id } });
+    const review = await prisma.review.delete({
+      where: { id },
+      include: {
+        provider: { select: { id: true, category: { select: { slug: true } } } },
+      },
+    });
+
+    // Bust the ISR cache so the provider's rating updates immediately.
+    revalidatePath(`/provider/${review.provider.id}`);
+    revalidatePath(`/category/${review.provider.category.slug}`);
+
     return NextResponse.json({ message: "Deleted" });
   } catch {
     // Prisma throws P2025 when the record doesn't exist.

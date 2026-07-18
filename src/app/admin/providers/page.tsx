@@ -9,10 +9,12 @@ export default async function AdminProvidersPage({
   searchParams: Promise<{ status?: string }>;
 }) {
   const session = await auth();
-  if (!session) redirect("/admin/login");
+  if (!session?.user) redirect("/admin/login");
 
   const { status } = await searchParams;
-  const statusFilter = status || "ALL";
+  const validStatuses = ["PENDING", "APPROVED", "REJECTED", "SUSPENDED"];
+  const statusFilter =
+    status && validStatuses.includes(status) ? status : "ALL";
 
   const where =
     statusFilter === "ALL" ? {} : { status: statusFilter };
