@@ -1,14 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendApprovalEmail } from "@/lib/email";
+
+// Bust the ISR cache for every public page a provider appears on, so status
+// changes are visible immediately instead of after the 60s revalidate window.
+function revalidateProviderPages(providerId: string, categorySlug: string) {
+  revalidatePath("/");
+  revalidatePath(`/category/${categorySlug}`);
+  revalidatePath(`/provider/${providerId}`);
+}
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
-  if (!session) {
+  if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -30,7 +39,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
-  if (!session) {
+  if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -57,6 +66,7 @@ export async function PATCH(
         console.error("Approval email failed:", emailError);
       }
 
+      revalidateProviderPages(provider.id, provider.category.slug);
       return NextResponse.json(provider);
     }
 
@@ -66,6 +76,7 @@ export async function PATCH(
         data: { status: "REJECTED" },
         include: { category: true },
       });
+      revalidateProviderPages(provider.id, provider.category.slug);
       return NextResponse.json(provider);
     }
 
@@ -75,11 +86,16 @@ export async function PATCH(
         data: { status: "SUSPENDED" },
         include: { category: true },
       });
+      revalidateProviderPages(provider.id, provider.category.slug);
       return NextResponse.json(provider);
     }
 
     if (action === "delete") {
-      await prisma.provider.delete({ where: { id } });
+      const provider = await prisma.provider.delete({
+        where: { id },
+        include: { category: true },
+      });
+      revalidateProviderPages(provider.id, provider.category.slug);
       return NextResponse.json({ message: "Deleted" });
     }
 

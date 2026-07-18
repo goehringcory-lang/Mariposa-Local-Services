@@ -53,6 +53,9 @@ export default function AdminProviderDetailPage() {
       }
       alert("Action failed. Please try again.");
       return false;
+    } catch {
+      alert("Network error. Please check your connection and try again.");
+      return false;
     } finally {
       setActionLoading("");
     }

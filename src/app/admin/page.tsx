@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 export default async function AdminDashboard() {
   const session = await auth();
-  if (!session) redirect("/admin/login");
+  if (!session?.user) redirect("/admin/login");
 
   const [pendingCount, approvedCount, totalReviews, recentProviders] =
     await Promise.all([
