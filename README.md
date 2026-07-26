@@ -15,18 +15,44 @@ Per-provider numbers live in the admin area under **Activity**
 Tracking sends no email and collects nothing from the visitor. IPs are never
 stored — they're salted and hashed purely for deduplication and rate limiting.
 
-### Deploying this change
+### Database schema
 
-The `ContactEvent` table must exist before deploy, or provider pages will
-error. This project has no migrations directory, so push the schema:
+This project has no migrations directory, so the schema is applied with
+`prisma db push`. The build script runs it automatically:
+
+```
+"build": "prisma db push && next build"
+```
+
+That means a deploy syncs the database to `schema.prisma` before building —
+add a model, merge, and the table exists. (`db push` regenerates the Prisma
+client as part of its run, so a separate `prisma generate` isn't needed.)
+
+Two things to know about this setup:
+
+- **A destructive change fails the build rather than applying it.** If a schema
+  edit would drop a column or table, `db push` stops and Vercel keeps the
+  previous deployment live. Resolve it deliberately with a manual
+  `--accept-data-loss` push, not by adding that flag to the build.
+- **Preview deployments share the production database.** A pull request
+  carrying a schema change will apply it to the live database when its preview
+  builds, before the PR is merged.
+
+If the schema ever gets out of sync, apply it by hand:
 
 ```bash
 DATABASE_URL="<your Neon connection string>" npx prisma db push
 ```
 
-Set `IP_HASH_SALT` to a long random string in your environment. It has a
-fallback so nothing breaks without it, but setting it makes the hashes
-unguessable.
+Symptoms of a missing table: `/admin` and `/admin/stats` return a server-side
+exception, while the public site keeps working. Call tracking fails silently
+in that state — the endpoint swallows errors so it never interrupts a phone
+call, so no taps are recorded until the schema is applied.
+
+### Environment
+
+Set `IP_HASH_SALT` to a long random string. It has a fallback so nothing
+breaks without it, but setting it makes the visitor hashes unguessable.
 
 ## Getting Started
 
