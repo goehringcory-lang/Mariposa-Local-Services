@@ -1,10 +1,10 @@
 import { createHash } from "crypto";
 import type { NextRequest } from "next/server";
 
-// These endpoints are unauthenticated by necessity — a homeowner tapping a
-// phone number isn't going to log in first. That makes them writable by
-// anyone, so both the tracking and the lead form need a notion of "who" a
-// visitor is, without actually storing anyone's IP address.
+// Call tracking is unauthenticated by necessity — a homeowner tapping a phone
+// number isn't going to log in first. That makes the endpoint writable by
+// anyone, so it needs a notion of "who" a visitor is, without actually storing
+// anyone's IP address.
 //
 // The stakes are higher than ordinary spam: these counts are the numbers we
 // show providers when selling placement. A number anyone can inflate with a
@@ -29,17 +29,4 @@ export function hashVisitor(request: NextRequest): string | null {
   if (!ip) return null;
 
   return createHash("sha256").update(`${IP_SALT}:${ip}`).digest("hex");
-}
-
-/**
- * Escapes user-supplied text before it's interpolated into notification email
- * HTML. Lead content comes from an anonymous form, so it is never trusted.
- */
-export function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
 }

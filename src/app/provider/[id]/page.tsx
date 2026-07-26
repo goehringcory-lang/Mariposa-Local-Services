@@ -4,7 +4,6 @@ import { prisma } from "@/lib/prisma";
 import PhoneButton from "@/components/ui/PhoneButton";
 import StarRating from "@/components/ui/StarRating";
 import ReviewForm from "@/components/reviews/ReviewForm";
-import QuoteForm from "@/components/leads/QuoteForm";
 
 export const revalidate = 60;
 
@@ -99,14 +98,6 @@ export default async function ProviderPage({
             </Link>
           </div>
         </div>
-      </div>
-
-      {/* Request a Quote */}
-      <div className="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-8">
-        <h2 className="text-2xl font-bold text-gray-700 mb-6">
-          Request a Quote
-        </h2>
-        <QuoteForm providerId={provider.id} providerName={provider.name} />
       </div>
 
       {/* Reviews Section */}

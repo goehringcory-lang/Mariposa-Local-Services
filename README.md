@@ -1,26 +1,24 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Lead tracking
+## Call tracking
 
-The directory records what it sends each provider, so there's something
-concrete to show them when discussing paid placement:
+The directory records the calls it sends each provider, so there's something
+concrete to show them when discussing paid placement.
 
-- **Calls** — tapping a provider's phone number posts to
-  `/api/providers/[id]/contact`. Counts are deduplicated per visitor per 30
-  minutes, so the figure is *unique callers*, not raw taps.
-- **Job requests** — the quote form on each provider page emails the provider
-  (admin CC'd) and stores the lead.
+Tapping a provider's phone number posts to `/api/providers/[id]/contact`.
+Counts are deduplicated per visitor per 30 minutes, so the figure is *unique
+callers*, not raw taps — it holds up if a provider asks how it's measured.
 
-Both live in the admin area: **Activity** (`/admin/stats`) for per-provider
-counts, **Job Requests** (`/admin/leads`) for the lead inbox.
+Per-provider numbers live in the admin area under **Activity**
+(`/admin/stats`).
 
-Visitor IPs are never stored. They're salted and hashed purely for
-deduplication and rate limiting.
+Tracking sends no email and collects nothing from the visitor. IPs are never
+stored — they're salted and hashed purely for deduplication and rate limiting.
 
 ### Deploying this change
 
-The `ContactEvent` and `Lead` tables must exist before deploy, or provider
-pages will error. This project has no migrations directory, so push the schema:
+The `ContactEvent` table must exist before deploy, or provider pages will
+error. This project has no migrations directory, so push the schema:
 
 ```bash
 DATABASE_URL="<your Neon connection string>" npx prisma db push

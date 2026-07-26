@@ -21,7 +21,6 @@ model Provider {
   updatedAt            DateTime       @updatedAt
   reviews              Review[]
   contactEvents        ContactEvent[]
-  leads                Lead[]
 }
 
 /// A recorded intent-to-contact — currently a visitor tapping a provider's
@@ -43,28 +42,6 @@ model ContactEvent {
 
   @@index([providerId, createdAt])
   @@index([ipHash, createdAt])
-}
-
-/// A quote request submitted through the site. Captures the visitors who
-/// won't cold-call a stranger — and unlike a phone tap, it leaves us contact
-/// details, so the provider can follow up and we can prove the lead landed.
-model Lead {
-  id           String   @id @default(cuid())
-  providerId   String
-  provider     Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
-  customerName String
-  phone        String
-  email        String?
-  message      String
-  /// NEW | CONTACTED | CLOSED — tracked so you can tell a provider how many
-  /// of their leads actually got worked.
-  status       String   @default("NEW")
-  ipHash       String?
-  createdAt    DateTime @default(now())
-
-  @@index([providerId, createdAt])
-  @@index([ipHash, createdAt])
-  @@index([status, createdAt])
 }
 
 model Category {

@@ -8,64 +8,42 @@ export default async function AdminDashboard() {
   const session = await auth();
   if (!session?.user) redirect("/admin/login");
 
-  // Contacts sent in the last 30 days — the headline number for how much work
-  // the directory is actually generating.
+  // Calls sent in the last 30 days — the headline number for how much work the
+  // directory is actually generating.
   const since = daysAgo(30);
 
-  const [
-    pendingCount,
-    approvedCount,
-    totalReviews,
-    recentProviders,
-    calls30,
-    leads30,
-    newLeads,
-  ] = await Promise.all([
-    prisma.provider.count({ where: { status: "PENDING" } }),
-    prisma.provider.count({
-      where: { status: "APPROVED" },
-    }),
-    prisma.review.count(),
-    prisma.provider.findMany({
-      where: { status: "PENDING" },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-      include: { category: true },
-    }),
-    prisma.contactEvent.count({ where: { createdAt: { gte: since } } }),
-    prisma.lead.count({ where: { createdAt: { gte: since } } }),
-    prisma.lead.count({ where: { status: "NEW" } }),
-  ]);
+  const [pendingCount, approvedCount, totalReviews, recentProviders, calls30] =
+    await Promise.all([
+      prisma.provider.count({ where: { status: "PENDING" } }),
+      prisma.provider.count({
+        where: { status: "APPROVED" },
+      }),
+      prisma.review.count(),
+      prisma.provider.findMany({
+        where: { status: "PENDING" },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+        include: { category: true },
+      }),
+      prisma.contactEvent.count({ where: { createdAt: { gte: since } } }),
+    ]);
 
   return (
     <div>
       <h1 className="text-3xl font-bold text-gray-700 mb-6">Dashboard</h1>
 
-      {/* Work sent to providers — the numbers that justify charging for a
+      {/* Work sent to providers — the number that justifies charging for a
           listing. Given top billing for that reason. */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <Link
-          href="/admin/stats"
-          className="bg-white rounded-xl shadow p-6 hover:shadow-lg transition-shadow"
-        >
-          <p className="text-base text-gray-400 mb-1">Calls Sent (30d)</p>
-          <p className="text-4xl font-bold text-success">{calls30}</p>
-        </Link>
-        <Link
-          href="/admin/leads"
-          className="bg-white rounded-xl shadow p-6 hover:shadow-lg transition-shadow"
-        >
-          <p className="text-base text-gray-400 mb-1">Job Requests (30d)</p>
-          <p className="text-4xl font-bold text-primary">{leads30}</p>
-        </Link>
-        <Link
-          href="/admin/leads"
-          className="bg-white rounded-xl shadow p-6 hover:shadow-lg transition-shadow"
-        >
-          <p className="text-base text-gray-400 mb-1">Unworked Requests</p>
-          <p className="text-4xl font-bold text-warning">{newLeads}</p>
-        </Link>
-      </div>
+      <Link
+        href="/admin/stats"
+        className="block bg-white rounded-xl shadow p-6 mb-6 hover:shadow-lg transition-shadow"
+      >
+        <p className="text-base text-gray-400 mb-1">Calls Sent (30d)</p>
+        <p className="text-5xl font-bold text-success">{calls30}</p>
+        <p className="text-base text-gray-400 mt-2">
+          See the breakdown by provider &rarr;
+        </p>
+      </Link>
 
       {/* Directory health */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

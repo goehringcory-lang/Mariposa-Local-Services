@@ -13,64 +13,45 @@ export default async function AdminStatsPage() {
 
   const since = daysAgo(WINDOW_DAYS);
 
-  const [providers, callsWindow, callsAllTime, leadsWindow, leadsAllTime] =
-    await Promise.all([
-      prisma.provider.findMany({
-        where: { status: "APPROVED" },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          category: { select: { name: true } },
-        },
-      }),
-      prisma.contactEvent.groupBy({
-        by: ["providerId"],
-        where: { createdAt: { gte: since } },
-        _count: { _all: true },
-      }),
-      prisma.contactEvent.groupBy({
-        by: ["providerId"],
-        _count: { _all: true },
-      }),
-      prisma.lead.groupBy({
-        by: ["providerId"],
-        where: { createdAt: { gte: since } },
-        _count: { _all: true },
-      }),
-      prisma.lead.groupBy({
-        by: ["providerId"],
-        _count: { _all: true },
-      }),
-    ]);
+  const [providers, callsWindow, callsAllTime] = await Promise.all([
+    prisma.provider.findMany({
+      where: { status: "APPROVED" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        category: { select: { name: true } },
+      },
+    }),
+    prisma.contactEvent.groupBy({
+      by: ["providerId"],
+      where: { createdAt: { gte: since } },
+      _count: { _all: true },
+    }),
+    prisma.contactEvent.groupBy({
+      by: ["providerId"],
+      _count: { _all: true },
+    }),
+  ]);
 
   const toMap = (rows: { providerId: string; _count: { _all: number } }[]) =>
     new Map(rows.map((r) => [r.providerId, r._count._all]));
 
   const callsIn30 = toMap(callsWindow);
   const callsEver = toMap(callsAllTime);
-  const leadsIn30 = toMap(leadsWindow);
-  const leadsEver = toMap(leadsAllTime);
 
   const rows = providers
-    .map((p) => {
-      const calls30 = callsIn30.get(p.id) ?? 0;
-      const leads30 = leadsIn30.get(p.id) ?? 0;
-      return {
-        ...p,
-        calls30,
-        leads30,
-        callsTotal: callsEver.get(p.id) ?? 0,
-        leadsTotal: leadsEver.get(p.id) ?? 0,
-        total30: calls30 + leads30,
-      };
-    })
+    .map((p) => ({
+      ...p,
+      calls30: callsIn30.get(p.id) ?? 0,
+      callsTotal: callsEver.get(p.id) ?? 0,
+    }))
     // Busiest first — these are the providers with a story worth telling, and
     // therefore the ones to approach about paid placement first.
-    .sort((a, b) => b.total30 - a.total30 || a.name.localeCompare(b.name));
+    .sort((a, b) => b.calls30 - a.calls30 || a.name.localeCompare(b.name));
 
   const totalCalls30 = rows.reduce((sum, r) => sum + r.calls30, 0);
-  const totalLeads30 = rows.reduce((sum, r) => sum + r.leads30, 0);
+  const totalCallsEver = rows.reduce((sum, r) => sum + r.callsTotal, 0);
 
   return (
     <div>
@@ -78,8 +59,8 @@ export default async function AdminStatsPage() {
         Provider Activity
       </h1>
       <p className="text-lg text-gray-400 mb-6">
-        What the directory sent each provider in the last {WINDOW_DAYS} days.
-        These are the numbers to quote when you talk to them about paid
+        Calls the directory sent each provider in the last {WINDOW_DAYS} days.
+        These are the numbers to cite when you talk to them about paid
         placement.
       </p>
 
@@ -91,18 +72,12 @@ export default async function AdminStatsPage() {
           <p className="text-4xl font-bold text-success">{totalCalls30}</p>
         </div>
         <div className="bg-white rounded-xl shadow p-6">
-          <p className="text-base text-gray-400 mb-1">
-            Job Requests ({WINDOW_DAYS}d)
-          </p>
-          <p className="text-4xl font-bold text-primary">{totalLeads30}</p>
+          <p className="text-base text-gray-400 mb-1">Calls All Time</p>
+          <p className="text-4xl font-bold text-primary">{totalCallsEver}</p>
         </div>
         <div className="bg-white rounded-xl shadow p-6">
-          <p className="text-base text-gray-400 mb-1">
-            Total Contacts ({WINDOW_DAYS}d)
-          </p>
-          <p className="text-4xl font-bold text-accent">
-            {totalCalls30 + totalLeads30}
-          </p>
+          <p className="text-base text-gray-400 mb-1">Active Listings</p>
+          <p className="text-4xl font-bold text-accent">{rows.length}</p>
         </div>
       </div>
 
@@ -121,9 +96,6 @@ export default async function AdminStatsPage() {
                   </th>
                   <th className="py-3 px-3 text-base font-bold text-gray-500 text-right whitespace-nowrap">
                     Calls ({WINDOW_DAYS}d)
-                  </th>
-                  <th className="py-3 px-3 text-base font-bold text-gray-500 text-right whitespace-nowrap">
-                    Requests ({WINDOW_DAYS}d)
                   </th>
                   <th className="py-3 pl-3 text-base font-bold text-gray-500 text-right whitespace-nowrap">
                     All Time
@@ -147,11 +119,8 @@ export default async function AdminStatsPage() {
                     <td className="py-4 px-3 text-right text-2xl font-bold text-success">
                       {row.calls30}
                     </td>
-                    <td className="py-4 px-3 text-right text-2xl font-bold text-primary">
-                      {row.leads30}
-                    </td>
                     <td className="py-4 pl-3 text-right text-lg text-gray-400 whitespace-nowrap">
-                      {row.callsTotal + row.leadsTotal}
+                      {row.callsTotal}
                     </td>
                   </tr>
                 ))}
