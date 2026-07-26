@@ -1,14 +1,55 @@
+"use client";
+
 interface PhoneButtonProps {
   phone: string;
+  providerId: string;
+  /** Which page the button sits on, so we can see where calls originate. */
+  source?: "category" | "provider";
   size?: "md" | "lg";
 }
 
-export default function PhoneButton({ phone, size = "lg" }: PhoneButtonProps) {
+export default function PhoneButton({
+  phone,
+  providerId,
+  source = "provider",
+  size = "lg",
+}: PhoneButtonProps) {
   const formatted = formatPhone(phone);
+
+  function recordTap() {
+    const payload = JSON.stringify({ source });
+    const url = `/api/providers/${providerId}/contact`;
+
+    try {
+      // Tapping a tel: link navigates away immediately, which cancels an
+      // in-flight fetch. sendBeacon is queued by the browser and delivered
+      // regardless — that's what makes these counts trustworthy enough to
+      // show a provider.
+      if (typeof navigator !== "undefined" && navigator.sendBeacon) {
+        navigator.sendBeacon(
+          url,
+          new Blob([payload], { type: "application/json" })
+        );
+        return;
+      }
+
+      // Older browsers: keepalive gives fetch the same survive-navigation
+      // behaviour.
+      void fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+        keepalive: true,
+      }).catch(() => {});
+    } catch {
+      // Never let tracking stand between a customer and a phone call.
+    }
+  }
 
   return (
     <a
       href={`tel:${phone.replace(/\D/g, "")}`}
+      onClick={recordTap}
       className={`inline-flex items-center justify-center gap-3 bg-success hover:bg-success-dark text-white font-bold rounded-xl transition-colors shadow-lg hover:shadow-xl ${
         size === "lg"
           ? "text-2xl px-8 py-5 min-h-[64px]"

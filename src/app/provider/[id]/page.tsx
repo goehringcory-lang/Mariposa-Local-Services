@@ -69,7 +69,12 @@ export default async function ProviderPage({
         </div>
 
         <div className="mb-6">
-          <PhoneButton phone={provider.phone} size="lg" />
+          <PhoneButton
+            phone={provider.phone}
+            providerId={provider.id}
+            source="provider"
+            size="lg"
+          />
         </div>
 
         <div className="space-y-3">

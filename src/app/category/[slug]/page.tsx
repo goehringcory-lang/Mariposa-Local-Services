@@ -124,7 +124,12 @@ export default async function CategoryPage({
                   </p>
                 </div>
                 <div className="flex flex-col items-start md:items-end gap-3">
-                  <PhoneButton phone={provider.phone} size="md" />
+                  <PhoneButton
+                    phone={provider.phone}
+                    providerId={provider.id}
+                    source="category"
+                    size="md"
+                  />
                   <Link
                     href={`/provider/${provider.id}`}
                     className="text-primary hover:text-primary-dark text-lg font-medium min-h-[48px] inline-flex items-center"

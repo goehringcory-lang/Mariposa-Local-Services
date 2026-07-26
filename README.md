@@ -1,5 +1,33 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Call tracking
+
+The directory records the calls it sends each provider, so there's something
+concrete to show them when discussing paid placement.
+
+Tapping a provider's phone number posts to `/api/providers/[id]/contact`.
+Counts are deduplicated per visitor per 30 minutes, so the figure is *unique
+callers*, not raw taps — it holds up if a provider asks how it's measured.
+
+Per-provider numbers live in the admin area under **Activity**
+(`/admin/stats`).
+
+Tracking sends no email and collects nothing from the visitor. IPs are never
+stored — they're salted and hashed purely for deduplication and rate limiting.
+
+### Deploying this change
+
+The `ContactEvent` table must exist before deploy, or provider pages will
+error. This project has no migrations directory, so push the schema:
+
+```bash
+DATABASE_URL="<your Neon connection string>" npx prisma db push
+```
+
+Set `IP_HASH_SALT` to a long random string in your environment. It has a
+fallback so nothing breaks without it, but setting it makes the hashes
+unguessable.
+
 ## Getting Started
 
 First, run the development server:
