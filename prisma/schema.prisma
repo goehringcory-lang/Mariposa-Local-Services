@@ -8,18 +8,63 @@ datasource db {
 }
 
 model Provider {
-  id                   String   @id @default(cuid())
+  id                   String         @id @default(cuid())
   name                 String
   phone                String
   email                String
   description          String
   categoryId           String
-  category             Category @relation(fields: [categoryId], references: [id])
-  areaServed           String   @default("Mariposa & Surrounding Areas")
-  status               String   @default("PENDING")
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  category             Category       @relation(fields: [categoryId], references: [id])
+  areaServed           String         @default("Mariposa & Surrounding Areas")
+  status               String         @default("PENDING")
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
   reviews              Review[]
+  contactEvents        ContactEvent[]
+  leads                Lead[]
+}
+
+/// A recorded intent-to-contact — currently a visitor tapping a provider's
+/// phone number. These are what let us tell a provider how much business the
+/// directory actually sent them, so the counts need to be honest: writes are
+/// deduplicated per visitor (see DEDUPE_WINDOW_MINUTES in the contact route)
+/// rather than counting every tap.
+model ContactEvent {
+  id         String   @id @default(cuid())
+  providerId String
+  provider   Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  type       String   @default("PHONE_TAP")
+  /// Which page the tap came from — "category" or "provider".
+  source     String   @default("unknown")
+  /// Salted hash of the visitor's IP. Used only for deduplication and rate
+  /// limiting; the raw address is never stored.
+  ipHash     String?
+  createdAt  DateTime @default(now())
+
+  @@index([providerId, createdAt])
+  @@index([ipHash, createdAt])
+}
+
+/// A quote request submitted through the site. Captures the visitors who
+/// won't cold-call a stranger — and unlike a phone tap, it leaves us contact
+/// details, so the provider can follow up and we can prove the lead landed.
+model Lead {
+  id           String   @id @default(cuid())
+  providerId   String
+  provider     Provider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  customerName String
+  phone        String
+  email        String?
+  message      String
+  /// NEW | CONTACTED | CLOSED — tracked so you can tell a provider how many
+  /// of their leads actually got worked.
+  status       String   @default("NEW")
+  ipHash       String?
+  createdAt    DateTime @default(now())
+
+  @@index([providerId, createdAt])
+  @@index([ipHash, createdAt])
+  @@index([status, createdAt])
 }
 
 model Category {

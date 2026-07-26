@@ -22,6 +22,18 @@ export default function AdminLayout({
                 Providers
               </Link>
               <Link
+                href="/admin/leads"
+                className="hover:text-accent transition-colors min-h-[48px] flex items-center text-base"
+              >
+                Job Requests
+              </Link>
+              <Link
+                href="/admin/stats"
+                className="hover:text-accent transition-colors min-h-[48px] flex items-center text-base"
+              >
+                Activity
+              </Link>
+              <Link
                 href="/admin/categories"
                 className="hover:text-accent transition-colors min-h-[48px] flex items-center text-base"
               >

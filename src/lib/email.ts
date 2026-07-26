@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { escapeHtml } from "./visitor";
 
 // Construct the Resend client lazily. The Resend constructor throws when no API
 // key is present, which would otherwise crash `next build` (page-data
@@ -118,6 +119,92 @@ export async function sendNewSubmissionNotification({
   if (error) {
     console.error("Failed to send admin notification:", error);
     // Don't throw — notification failure shouldn't block submission
+  }
+
+  return data;
+}
+
+interface SendLeadNotificationParams {
+  lead: {
+    customerName: string;
+    phone: string;
+    email: string | null;
+    message: string;
+  };
+  providerName: string;
+  providerEmail: string;
+  categoryName: string;
+}
+
+/**
+ * Delivers a quote request to the provider, with the admin copied so there's a
+ * record of the lead landing even if the provider never replies.
+ *
+ * Every interpolated value here is attacker-controlled (the form is public and
+ * unauthenticated), so all of it is escaped before it reaches the HTML.
+ */
+export async function sendLeadNotification({
+  lead,
+  providerName,
+  providerEmail,
+  categoryName,
+}: SendLeadNotificationParams) {
+  const resend = getResend();
+  if (!resend) {
+    console.warn("RESEND_API_KEY not set — skipping lead notification email.");
+    return null;
+  }
+
+  const adminEmail = process.env.ADMIN_EMAIL || "goehring.cory@gmail.com";
+
+  const name = escapeHtml(lead.customerName);
+  const phone = escapeHtml(lead.phone);
+  const email = lead.email ? escapeHtml(lead.email) : null;
+  const message = escapeHtml(lead.message).replace(/\n/g, "<br />");
+  const business = escapeHtml(providerName);
+  const category = escapeHtml(categoryName);
+  const dialable = lead.phone.replace(/\D/g, "");
+
+  const { data, error } = await resend.emails.send({
+    from: FROM_ADDRESS,
+    to: providerEmail,
+    cc: adminEmail,
+    // Lets the provider hit reply and reach the customer directly when they
+    // left an address.
+    ...(lead.email ? { replyTo: lead.email } : {}),
+    subject: `New job request from ${lead.customerName} — Mariposa Local Services`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h1 style="color: #1a5276; font-size: 24px;">You have a new job request!</h1>
+        <p style="font-size: 16px; color: #333; line-height: 1.6;">
+          Hi <strong>${business}</strong>, someone found you on Mariposa Local
+          Services under <strong>${category}</strong> and wants to hear from you.
+        </p>
+        <div style="background: #f7f7f7; border-left: 4px solid #d4ac0d; padding: 16px; margin: 20px 0;">
+          <table style="font-size: 16px; color: #333; line-height: 1.8;">
+            <tr><td style="padding-right: 12px;"><strong>Name:</strong></td><td>${name}</td></tr>
+            <tr><td style="padding-right: 12px;"><strong>Phone:</strong></td><td><a href="tel:${dialable}" style="color: #1a5276;">${phone}</a></td></tr>
+            ${email ? `<tr><td style="padding-right: 12px;"><strong>Email:</strong></td><td><a href="mailto:${email}" style="color: #1a5276;">${email}</a></td></tr>` : ""}
+          </table>
+          <p style="font-size: 16px; color: #333; line-height: 1.6; margin-top: 12px;">
+            <strong>What they need:</strong><br />${message}
+          </p>
+        </div>
+        <p style="font-size: 16px; color: #333; line-height: 1.6;">
+          <strong>Call them back soon</strong> — folks usually contact more than
+          one provider, and the first to respond most often gets the job.
+        </p>
+        <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;" />
+        <p style="font-size: 14px; color: #888;">
+          Mariposa Local Services — Your trusted local directory
+        </p>
+      </div>
+    `,
+  });
+
+  if (error) {
+    console.error("Failed to send lead notification:", error);
+    throw error;
   }
 
   return data;

@@ -1,5 +1,35 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Lead tracking
+
+The directory records what it sends each provider, so there's something
+concrete to show them when discussing paid placement:
+
+- **Calls** — tapping a provider's phone number posts to
+  `/api/providers/[id]/contact`. Counts are deduplicated per visitor per 30
+  minutes, so the figure is *unique callers*, not raw taps.
+- **Job requests** — the quote form on each provider page emails the provider
+  (admin CC'd) and stores the lead.
+
+Both live in the admin area: **Activity** (`/admin/stats`) for per-provider
+counts, **Job Requests** (`/admin/leads`) for the lead inbox.
+
+Visitor IPs are never stored. They're salted and hashed purely for
+deduplication and rate limiting.
+
+### Deploying this change
+
+The `ContactEvent` and `Lead` tables must exist before deploy, or provider
+pages will error. This project has no migrations directory, so push the schema:
+
+```bash
+DATABASE_URL="<your Neon connection string>" npx prisma db push
+```
+
+Set `IP_HASH_SALT` to a long random string in your environment. It has a
+fallback so nothing breaks without it, but setting it makes the hashes
+unguessable.
+
 ## Getting Started
 
 First, run the development server:
