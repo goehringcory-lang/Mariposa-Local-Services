@@ -58,8 +58,30 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-8 pt-6 border-t border-gray-600 text-center text-gray-400 text-base">
-          &copy; {new Date().getFullYear()} Mariposa Local Services. All rights
-          reserved.
+          <div className="flex flex-wrap justify-center gap-x-6 mb-2">
+            <Link
+              href="/terms"
+              className="text-gray-300 hover:text-white text-base min-h-[48px] inline-flex items-center"
+            >
+              Terms of Use
+            </Link>
+            <Link
+              href="/business-terms"
+              className="text-gray-300 hover:text-white text-base min-h-[48px] inline-flex items-center"
+            >
+              Business Listing Terms
+            </Link>
+            <Link
+              href="/privacy"
+              className="text-gray-300 hover:text-white text-base min-h-[48px] inline-flex items-center"
+            >
+              Privacy Policy
+            </Link>
+          </div>
+          <p>
+            &copy; {new Date().getFullYear()} Mariposa Local Services. All
+            rights reserved.
+          </p>
         </div>
       </div>
     </footer>

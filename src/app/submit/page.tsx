@@ -18,6 +18,7 @@ export default function SubmitPage() {
     description: "",
     categoryId: "",
     areaServed: "Mariposa & Surrounding Areas",
+    agreedToTerms: false,
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -152,7 +153,7 @@ export default function SubmitPage() {
               required
             />
             <p className="text-base text-gray-300 mt-1">
-              Used for account management and payment — not shown publicly
+              Used to contact you about your listing — not shown publicly
             </p>
           </div>
 
@@ -216,6 +217,52 @@ export default function SubmitPage() {
               className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 text-lg focus:border-primary focus:outline-none"
               placeholder="Mariposa, Midpines, El Portal..."
             />
+          </div>
+
+          <div className="border-t-2 border-gray-100 pt-5">
+            <div className="flex items-start gap-3">
+              {/* Links open in a new tab so reading the terms doesn't wipe out
+                  everything typed into the form. */}
+              <input
+                type="checkbox"
+                id="agreedToTerms"
+                checked={form.agreedToTerms}
+                onChange={(e) =>
+                  setForm({ ...form, agreedToTerms: e.target.checked })
+                }
+                className="mt-1.5 h-6 w-6 shrink-0 accent-primary cursor-pointer"
+                required
+              />
+              <label
+                htmlFor="agreedToTerms"
+                className="text-lg text-gray-600 cursor-pointer py-1"
+              >
+                I have read and agree to the{" "}
+                <Link
+                  href="/business-terms"
+                  target="_blank"
+                  rel="noopener"
+                  className="text-primary underline font-bold"
+                >
+                  Business Listing Terms
+                </Link>{" "}
+                and the{" "}
+                <Link
+                  href="/terms"
+                  target="_blank"
+                  rel="noopener"
+                  className="text-primary underline font-bold"
+                >
+                  Terms of Use
+                </Link>
+                . *
+              </label>
+            </div>
+            <p className="text-base text-gray-300 mt-2 ml-9">
+              This means your listing may be shown publicly and that community
+              members may post reviews about your business, including negative
+              ones.
+            </p>
           </div>
 
           <button

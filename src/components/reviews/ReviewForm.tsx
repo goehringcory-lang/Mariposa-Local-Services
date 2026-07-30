@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import StarRating from "@/components/ui/StarRating";
 
 export default function ReviewForm({ providerId }: { providerId: string }) {
@@ -113,6 +114,20 @@ export default function ReviewForm({ providerId }: { providerId: string }) {
           placeholder="Tell others about your experience..."
         />
       </div>
+
+      <p className="text-base text-gray-400">
+        Please share honest feedback based on your own experience. By submitting
+        a review, you agree to our{" "}
+        <Link
+          href="/terms"
+          target="_blank"
+          rel="noopener"
+          className="text-primary underline"
+        >
+          Terms of Use
+        </Link>
+        .
+      </p>
 
       <button
         type="submit"

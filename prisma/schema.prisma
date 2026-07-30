@@ -17,6 +17,10 @@ model Provider {
   category             Category       @relation(fields: [categoryId], references: [id])
   areaServed           String         @default("Mariposa & Surrounding Areas")
   status               String         @default("PENDING")
+  /// When the submitter checked the "I agree" box for the Business Listing
+  /// Terms and Terms of Use. Set server-side at submission. Null means the
+  /// listing predates the terms, not that consent was skipped.
+  acceptedTermsAt      DateTime?
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @updatedAt
   reviews              Review[]
