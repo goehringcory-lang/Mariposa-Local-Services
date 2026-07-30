@@ -21,6 +21,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Strict equality, not truthiness: a hand-crafted request sending "false"
+    // or 1 shouldn't count as agreeing to the listing terms.
+    if (body.agreedToTerms !== true) {
+      return NextResponse.json(
+        {
+          error:
+            "You must agree to the Business Listing Terms and Terms of Use to submit a listing.",
+        },
+        { status: 400 }
+      );
+    }
+
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
       return NextResponse.json(
@@ -49,6 +61,9 @@ export async function POST(request: NextRequest) {
         categoryId,
         areaServed: areaServed || "Mariposa & Surrounding Areas",
         status: "PENDING",
+        // Timestamped here rather than taken from the client so the record of
+        // consent can't be spoofed or predated.
+        acceptedTermsAt: new Date(),
       },
     });
 
