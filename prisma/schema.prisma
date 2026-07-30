@@ -21,6 +21,15 @@ model Provider {
   /// Terms and Terms of Use. Set server-side at submission. Null means the
   /// listing predates the terms, not that consent was skipped.
   acceptedTermsAt      DateTime?
+  /// Which version of the terms was accepted, by effective date (see
+  /// LEGAL_EFFECTIVE_DATE). Lets us tell who agreed to which revision when the
+  /// terms change, rather than having to assume everyone accepted the latest.
+  acceptedTermsVersion String?
+  /// Unguessable token for the emailed one-click acceptance link
+  /// (/accept-terms/[token]). Only set for listings created before the terms
+  /// existed, which is why it's nullable — new signups accept at submission
+  /// time and never need a link.
+  termsToken           String?        @unique
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @updatedAt
   reviews              Review[]

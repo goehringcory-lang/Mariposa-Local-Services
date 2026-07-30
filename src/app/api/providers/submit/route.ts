@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendNewSubmissionNotification } from "@/lib/email";
+import { LEGAL_EFFECTIVE_DATE } from "@/lib/legal";
 
 export async function POST(request: NextRequest) {
   try {
@@ -64,6 +65,7 @@ export async function POST(request: NextRequest) {
         // Timestamped here rather than taken from the client so the record of
         // consent can't be spoofed or predated.
         acceptedTermsAt: new Date(),
+        acceptedTermsVersion: LEGAL_EFFECTIVE_DATE,
       },
     });
 
