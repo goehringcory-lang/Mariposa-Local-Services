@@ -34,6 +34,9 @@ model Provider {
   updatedAt            DateTime       @updatedAt
   reviews              Review[]
   contactEvents        ContactEvent[]
+
+  // Category pages filter on both; Postgres doesn't index foreign keys on its own.
+  @@index([categoryId, status])
 }
 
 /// A recorded intent-to-contact — currently a visitor tapping a provider's
@@ -76,6 +79,9 @@ model Review {
   authorName String
   approved   Boolean  @default(true)
   createdAt  DateTime @default(now())
+
+  // Every provider and category page loads reviews by provider.
+  @@index([providerId])
 }
 
 model AdminUser {

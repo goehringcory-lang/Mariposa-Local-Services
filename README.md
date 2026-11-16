@@ -24,6 +24,10 @@ error. This project has no migrations directory, so push the schema:
 DATABASE_URL="<your Neon connection string>" npx prisma db push
 ```
 
+The schema also adds database indexes on `Review.providerId` and
+`Provider(categoryId, status)`. They're optional (the site works without
+them), but run the same `db push` to get the faster queries.
+
 Set `IP_HASH_SALT` to a long random string in your environment. It has a
 fallback so nothing breaks without it, but setting it makes the hashes
 unguessable.

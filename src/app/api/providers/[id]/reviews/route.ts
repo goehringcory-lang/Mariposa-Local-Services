@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { LIMITS } from "@/lib/limits";
 
 export async function GET(
   _request: NextRequest,
@@ -8,8 +9,10 @@ export async function GET(
 ) {
   const { id } = await params;
 
+  // Only expose reviews for listings that are publicly visible — a rejected or
+  // suspended provider's page is gone, so its reviews should be too.
   const reviews = await prisma.review.findMany({
-    where: { providerId: id, approved: true },
+    where: { providerId: id, approved: true, provider: { status: "APPROVED" } },
     orderBy: { createdAt: "desc" },
   });
 
@@ -33,6 +36,16 @@ export async function POST(
     if (!authorName || !rating) {
       return NextResponse.json(
         { error: "Name and rating are required." },
+        { status: 400 }
+      );
+    }
+
+    if (
+      authorName.length > LIMITS.reviewAuthorName ||
+      comment.length > LIMITS.reviewComment
+    ) {
+      return NextResponse.json(
+        { error: "Your name or comment is too long." },
         { status: 400 }
       );
     }

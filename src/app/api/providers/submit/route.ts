@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendNewSubmissionNotification } from "@/lib/email";
 import { LEGAL_EFFECTIVE_DATE } from "@/lib/legal";
+import { LIMITS, isValidUsPhone } from "@/lib/limits";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { categoryId } = body;
+    const categoryId =
+      typeof body.categoryId === "string" ? body.categoryId : "";
     const name = typeof body.name === "string" ? body.name.trim() : "";
     const phone = typeof body.phone === "string" ? body.phone.trim() : "";
     const email = typeof body.email === "string" ? body.email.trim() : "";
@@ -34,6 +36,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (
+      name.length > LIMITS.providerName ||
+      phone.length > LIMITS.providerPhone ||
+      email.length > LIMITS.providerEmail ||
+      description.length > LIMITS.providerDescription ||
+      areaServed.length > LIMITS.areaServed
+    ) {
+      return NextResponse.json(
+        { error: "One or more fields is too long." },
+        { status: 400 }
+      );
+    }
+
+    if (!isValidUsPhone(phone)) {
+      return NextResponse.json(
+        { error: "Please enter a 10-digit phone number, including area code." },
+        { status: 400 }
+      );
+    }
+
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
       return NextResponse.json(
@@ -50,6 +72,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Invalid category selected." },
         { status: 400 }
+      );
+    }
+
+    // A double-click or an impatient resubmit shouldn't create duplicate
+    // listings (and a duplicate admin email each time).
+    const pendingDuplicate = await prisma.provider.findFirst({
+      where: { email: email.toLowerCase(), status: "PENDING" },
+      select: { id: true },
+    });
+    if (pendingDuplicate) {
+      return NextResponse.json(
+        {
+          error:
+            "A listing with this email is already waiting for review. We'll be in touch soon.",
+        },
+        { status: 409 }
       );
     }
 
