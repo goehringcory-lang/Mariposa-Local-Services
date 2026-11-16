@@ -48,6 +48,15 @@ export const HOMEPAGE_BANNER_ADS: Ad[] = [
     highlights: ["Set price", "Set plan", "Free 30-minute call"],
     ctaLabel: "See how it works",
   },
+  {
+    businessName: "The Talus Field",
+    title: "Yosemite visitors plan the trip here. Be on the page.",
+    description:
+      "List your business in the directory of an independent Yosemite journal, read by people about to book a room, a guide or a tour. From $300 a year. Every paid placement is labeled.",
+    // Photo: Rodrigo Soares, Unsplash
+    imageUrl: "/ads/talus-field-valley-view.jpg",
+    linkUrl: "https://thetalusfieldjournal.com/advertise",
+  },
 ];
 
 /** Ads shown in the sidebar grid on the homepage */
