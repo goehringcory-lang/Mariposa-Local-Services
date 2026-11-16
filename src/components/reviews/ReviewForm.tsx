@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import StarRating from "@/components/ui/StarRating";
+import { LIMITS } from "@/lib/limits";
 
 export default function ReviewForm({ providerId }: { providerId: string }) {
   const [authorName, setAuthorName] = useState("");
@@ -83,6 +84,7 @@ export default function ReviewForm({ providerId }: { providerId: string }) {
         <input
           type="text"
           id="authorName"
+          maxLength={LIMITS.reviewAuthorName}
           value={authorName}
           onChange={(e) => setAuthorName(e.target.value)}
           className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 text-lg focus:border-primary focus:outline-none"
@@ -107,6 +109,7 @@ export default function ReviewForm({ providerId }: { providerId: string }) {
         </label>
         <textarea
           id="comment"
+          maxLength={LIMITS.reviewComment}
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 text-lg focus:border-primary focus:outline-none"

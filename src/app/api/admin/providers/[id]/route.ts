@@ -34,6 +34,12 @@ export async function GET(
   return NextResponse.json(provider);
 }
 
+const STATUS_FOR_ACTION: Record<string, string> = {
+  approve: "APPROVED",
+  reject: "REJECTED",
+  suspend: "SUSPENDED",
+};
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -44,50 +50,28 @@ export async function PATCH(
   }
 
   const { id } = await params;
-  const body = await request.json();
-  const { action } = body;
+
+  let action: unknown;
+  try {
+    ({ action } = await request.json());
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+
+  // Object.hasOwn, not `in`: "toString" and friends are on the prototype.
+  const isStatusAction =
+    typeof action === "string" && Object.hasOwn(STATUS_FOR_ACTION, action);
+  if (action !== "delete" && !isStatusAction) {
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+  }
 
   try {
-    if (action === "approve") {
-      const provider = await prisma.provider.update({
-        where: { id },
-        data: { status: "APPROVED" },
-        include: { category: true },
-      });
-
-      // Send approval email to the provider
-      try {
-        await sendApprovalEmail({
-          providerName: provider.name,
-          providerEmail: provider.email,
-          categoryName: provider.category.name,
-        });
-      } catch (emailError) {
-        console.error("Approval email failed:", emailError);
-      }
-
-      revalidateProviderPages(provider.id, provider.category.slug);
-      return NextResponse.json(provider);
-    }
-
-    if (action === "reject") {
-      const provider = await prisma.provider.update({
-        where: { id },
-        data: { status: "REJECTED" },
-        include: { category: true },
-      });
-      revalidateProviderPages(provider.id, provider.category.slug);
-      return NextResponse.json(provider);
-    }
-
-    if (action === "suspend") {
-      const provider = await prisma.provider.update({
-        where: { id },
-        data: { status: "SUSPENDED" },
-        include: { category: true },
-      });
-      revalidateProviderPages(provider.id, provider.category.slug);
-      return NextResponse.json(provider);
+    const existing = await prisma.provider.findUnique({
+      where: { id },
+      select: { status: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
     if (action === "delete") {
@@ -99,7 +83,32 @@ export async function PATCH(
       return NextResponse.json({ message: "Deleted" });
     }
 
-    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+    const status = STATUS_FOR_ACTION[action as string];
+    const provider = await prisma.provider.update({
+      where: { id },
+      data: { status },
+      include: { category: true },
+    });
+
+    // Only welcome a provider when the listing first goes live — re-clicking
+    // Approve, or reinstating a suspended listing, shouldn't send another
+    // "Welcome!" email. (Suspended listings were approved before.)
+    const wasLiveBefore =
+      existing.status === "APPROVED" || existing.status === "SUSPENDED";
+    if (status === "APPROVED" && !wasLiveBefore) {
+      try {
+        await sendApprovalEmail({
+          providerName: provider.name,
+          providerEmail: provider.email,
+          categoryName: provider.category.name,
+        });
+      } catch (emailError) {
+        console.error("Approval email failed:", emailError);
+      }
+    }
+
+    revalidateProviderPages(provider.id, provider.category.slug);
+    return NextResponse.json(provider);
   } catch {
     return NextResponse.json({ error: "Action failed" }, { status: 500 });
   }

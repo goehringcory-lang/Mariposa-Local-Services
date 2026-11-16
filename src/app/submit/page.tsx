@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { LIMITS } from "@/lib/limits";
 
 interface Category {
   id: string;
@@ -110,6 +111,7 @@ export default function SubmitPage() {
             <input
               type="text"
               id="name"
+              maxLength={LIMITS.providerName}
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 text-lg focus:border-primary focus:outline-none"
@@ -128,6 +130,7 @@ export default function SubmitPage() {
             <input
               type="tel"
               id="phone"
+              maxLength={LIMITS.providerPhone}
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
               className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 text-lg focus:border-primary focus:outline-none"
@@ -146,6 +149,7 @@ export default function SubmitPage() {
             <input
               type="email"
               id="email"
+              maxLength={LIMITS.providerEmail}
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               className="w-full border-2 border-gray-200 rounded-lg px-4 py-3 text-lg focus:border-primary focus:outline-none"
@@ -189,6 +193,7 @@ export default function SubmitPage() {
             </label>
             <textarea
               id="description"
+              maxLength={LIMITS.providerDescription}
               value={form.description}
               onChange={(e) =>
                 setForm({ ...form, description: e.target.value })
@@ -210,6 +215,7 @@ export default function SubmitPage() {
             <input
               type="text"
               id="areaServed"
+              maxLength={LIMITS.areaServed}
               value={form.areaServed}
               onChange={(e) =>
                 setForm({ ...form, areaServed: e.target.value })

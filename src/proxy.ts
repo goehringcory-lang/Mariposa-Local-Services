@@ -5,14 +5,16 @@ import type { NextRequest } from "next/server";
 //
 // The authoritative authorization still lives on the server (each admin page
 // calls `auth()` and every admin API route returns 401 without a session).
-// This middleware is the front line: it keeps unauthenticated visitors out of
+// This proxy is the front line: it keeps unauthenticated visitors out of
 // the admin UI entirely — including the client-rendered pages that would
 // otherwise render their shell (or crash) before any data loads — and bounces
 // already-signed-in users away from the login screen.
 //
 // We check for the NextAuth session cookie rather than decoding it here so the
-// middleware stays on the edge runtime and never bundles Prisma/bcrypt.
-export function middleware(req: NextRequest) {
+// proxy stays lightweight and never bundles Prisma/bcrypt.
+//
+// (Named proxy.ts because Next.js 16 deprecated the "middleware" convention.)
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   const hasSession =

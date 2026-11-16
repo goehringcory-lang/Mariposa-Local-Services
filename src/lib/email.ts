@@ -1,4 +1,17 @@
 import { Resend } from "resend";
+import { getSiteUrl } from "./terms";
+
+// Everything interpolated into these templates comes from the public submit
+// form, so it must be escaped — otherwise a "business name" containing markup
+// or a phishing link renders as live HTML in the admin's inbox.
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 // Construct the Resend client lazily. The Resend constructor throws when no API
 // key is present, which would otherwise crash `next build` (page-data
@@ -42,10 +55,10 @@ export async function sendApprovalEmail({
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <h1 style="color: #1a5276; font-size: 24px;">Welcome to Mariposa Local Services!</h1>
         <p style="font-size: 16px; color: #333; line-height: 1.6;">
-          Hi <strong>${providerName}</strong>,
+          Hi <strong>${escapeHtml(providerName)}</strong>,
         </p>
         <p style="font-size: 16px; color: #333; line-height: 1.6;">
-          Great news — your listing under <strong>${categoryName}</strong> has been approved!
+          Great news — your listing under <strong>${escapeHtml(categoryName)}</strong> has been approved!
           Your business will now be visible to locals searching for services in the Mariposa area.
         </p>
         <p style="font-size: 16px; color: #333; line-height: 1.6;">
@@ -95,7 +108,7 @@ export async function sendNewSubmissionNotification({
   const { data, error } = await resend.emails.send({
     from: FROM_ADDRESS,
     to: adminEmail,
-    subject: `New listing submission: ${providerName}`,
+    subject: `New listing submission: ${providerName.replace(/[\r\n]+/g, " ")}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <h1 style="color: #1a5276; font-size: 24px;">New Listing Submission</h1>
@@ -103,13 +116,13 @@ export async function sendNewSubmissionNotification({
           A new business has submitted a listing for review:
         </p>
         <table style="font-size: 16px; color: #333; line-height: 1.8;">
-          <tr><td style="padding-right: 12px;"><strong>Business:</strong></td><td>${providerName}</td></tr>
-          <tr><td style="padding-right: 12px;"><strong>Category:</strong></td><td>${categoryName}</td></tr>
-          <tr><td style="padding-right: 12px;"><strong>Email:</strong></td><td>${providerEmail}</td></tr>
-          <tr><td style="padding-right: 12px;"><strong>Phone:</strong></td><td>${providerPhone}</td></tr>
+          <tr><td style="padding-right: 12px;"><strong>Business:</strong></td><td>${escapeHtml(providerName)}</td></tr>
+          <tr><td style="padding-right: 12px;"><strong>Category:</strong></td><td>${escapeHtml(categoryName)}</td></tr>
+          <tr><td style="padding-right: 12px;"><strong>Email:</strong></td><td>${escapeHtml(providerEmail)}</td></tr>
+          <tr><td style="padding-right: 12px;"><strong>Phone:</strong></td><td>${escapeHtml(providerPhone)}</td></tr>
         </table>
         <p style="font-size: 16px; color: #333; line-height: 1.6; margin-top: 20px;">
-          Log in to the <a href="${process.env.NEXTAUTH_URL || "http://localhost:3000"}/admin" style="color: #1a5276;">admin dashboard</a> to review and approve this listing.
+          Log in to the <a href="${getSiteUrl()}/admin" style="color: #1a5276;">admin dashboard</a> to review and approve this listing.
         </p>
       </div>
     `,

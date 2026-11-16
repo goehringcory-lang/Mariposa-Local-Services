@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -21,7 +22,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
+  let body: { name?: unknown; description?: unknown };
+  try {
+    body = (await request.json()) ?? {};
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
   const name = typeof body.name === "string" ? body.name.trim() : "";
   const description =
     typeof body.description === "string" ? body.description.trim() : "";
@@ -65,6 +71,10 @@ export async function POST(request: NextRequest) {
     },
   });
 
+  // The home page lists every category; without this a new one stays hidden
+  // until the 60s ISR window expires.
+  revalidatePath("/");
+
   return NextResponse.json(category, { status: 201 });
 }
 
@@ -101,5 +111,7 @@ export async function DELETE(request: NextRequest) {
   }
 
   await prisma.category.delete({ where: { id } });
+  revalidatePath("/");
+  revalidatePath(`/category/${category.slug}`);
   return NextResponse.json({ message: "Deleted" });
 }
