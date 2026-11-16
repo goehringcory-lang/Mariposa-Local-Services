@@ -39,3 +39,198 @@ a[href^="tel:"] {
   font-weight: 700;
   text-decoration: none;
 }
+
+/* ------------------------------------------------------------
+   Spotlight ad: the large dark banner used for "featured" ads
+   (see src/config/ads.ts). All motion stops for visitors who
+   ask their device to reduce motion.
+   ------------------------------------------------------------ */
+.ad-spotlight {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  color: #edf1f7;
+  background:
+    radial-gradient(120% 120% at 62% 30%, rgba(17, 58, 55, 0.9) 0%, rgba(9, 30, 32, 0.55) 45%, transparent 78%),
+    #0b0f1c;
+  box-shadow:
+    0 0 0 2px rgba(45, 124, 243, 0.55),
+    0 18px 50px -12px rgba(37, 99, 201, 0.65);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  animation: ad-spotlight-glow 3.2s ease-in-out infinite;
+}
+a:hover > .ad-spotlight,
+a:focus-visible > .ad-spotlight {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow:
+    0 0 0 3px rgba(45, 124, 243, 0.95),
+    0 26px 60px -10px rgba(37, 99, 201, 0.9);
+}
+.ad-spotlight__orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(40px);
+  pointer-events: none;
+}
+.ad-spotlight__orb--a {
+  width: 22rem;
+  height: 22rem;
+  right: -5rem;
+  bottom: -9rem;
+  background: radial-gradient(circle, rgba(150, 104, 255, 0.95), rgba(104, 56, 232, 0.5) 55%, transparent 80%);
+  animation: ad-spotlight-drift 9s ease-in-out infinite alternate;
+}
+.ad-spotlight__orb--b {
+  width: 16rem;
+  height: 16rem;
+  left: 8%;
+  top: -9rem;
+  background: radial-gradient(circle, rgba(124, 84, 240, 0.7), transparent 75%);
+  animation: ad-spotlight-drift 11s ease-in-out infinite alternate-reverse;
+}
+.ad-spotlight__ridge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 55%;
+  pointer-events: none;
+}
+/* A band of light that sweeps across every few seconds */
+.ad-spotlight__shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.16) 50%, transparent 60%);
+  transform: translateX(-100%);
+  animation: ad-spotlight-shine 5s ease-in-out infinite;
+}
+.ad-spotlight__inner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.75rem 1.5rem 2rem;
+}
+.ad-spotlight__brand {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+  margin-bottom: 0.75rem;
+}
+.ad-spotlight__logo {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+.ad-spotlight__name {
+  font-size: 0.875rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.ad-spotlight__tag {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(237, 241, 247, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 9999px;
+  padding: 0.125rem 0.5rem;
+}
+.ad-spotlight__title {
+  font-size: clamp(1.875rem, 4.6vw, 3rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+}
+.ad-spotlight__accent {
+  background: linear-gradient(100deg, #2d7cf3, #6fb1ff 55%, #2d7cf3);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 18px rgba(45, 124, 243, 0.55));
+}
+.ad-spotlight__desc {
+  margin-top: 0.75rem;
+  max-width: 38rem;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  color: rgba(237, 241, 247, 0.82);
+}
+.ad-spotlight__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.ad-spotlight__pills li {
+  font-size: 0.875rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(4px);
+}
+.ad-spotlight__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  align-self: flex-start;
+  white-space: nowrap;
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: #fff;
+  padding: 0.9rem 1.6rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #2d7cf3, #2563c9);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18) inset, 0 10px 30px -6px rgba(45, 124, 243, 0.9);
+  animation: ad-spotlight-pulse 2.4s ease-in-out infinite;
+}
+@media (min-width: 768px) {
+  .ad-spotlight__inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 2.5rem 2.75rem;
+  }
+  .ad-spotlight__cta {
+    align-self: center;
+    font-size: 1.25rem;
+    padding: 1.05rem 2rem;
+  }
+}
+@keyframes ad-spotlight-glow {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(45, 124, 243, 0.55), 0 18px 50px -12px rgba(37, 99, 201, 0.65); }
+  50% { box-shadow: 0 0 0 2px rgba(111, 177, 255, 0.9), 0 22px 60px -8px rgba(112, 62, 236, 0.75); }
+}
+@keyframes ad-spotlight-drift {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(-3rem, -1.5rem) scale(1.15); }
+}
+@keyframes ad-spotlight-shine {
+  0%, 55% { transform: translateX(-100%); }
+  85%, 100% { transform: translateX(100%); }
+}
+@keyframes ad-spotlight-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ad-spotlight,
+  .ad-spotlight__orb,
+  .ad-spotlight__shine,
+  .ad-spotlight__cta {
+    animation: none;
+  }
+  .ad-spotlight__shine { display: none; }
+  a:hover > .ad-spotlight { transform: none; }
+}
